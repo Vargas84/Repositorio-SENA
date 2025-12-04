@@ -33,7 +33,7 @@ class Pedido:
     # el objeto PlatoPedido y se agrega a la lista interna del pedido
     plato_pedido=PlatoPedido(plato,cantidad)
     self.platos_pedidos.append(plato_pedido)
-    print(f'Plato {plato.nombre} agregado correctamente')
+    #print(f'Plato {plato.nombre} agregado correctamente al pedido')
 
   def eliminar_plato_pedido(self,id_plato):#se elimina un plato del pedido
     for plato_pedido in self.platos_pedidos:# se recorre la lista interna

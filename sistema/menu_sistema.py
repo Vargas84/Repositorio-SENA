@@ -59,8 +59,33 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
               continue #vuelve al menu principal
 
             print('Clave correcta, Bienvenido administrador')#clave correcta da permiso al menu de administrador
-            admin = Administrador(1, "ADMIN", 0, 0)#se crea un administrador por defecto
+            while True:#ciclo para validar que se ingrese un nombre correctamente
+               nombre=input("Ingrese su nombre administrador: ")
+               if not es_letras_y_espacios(nombre) or nombre is None:
+                  print("Verifique los datos del nombre")
+               else:
+                  break
+            while True:#ciclo para verificar que se ingrese el documento correctamente
+               documento=input(f"Administrador {nombre} ingrese su numero de documento: ")
+               if documento.isdigit():
+                  documento=int(documento)
+                  break
+               else:
+                  print("El documento debe ser un valor unicamente numerico")
+                  continue
+            while True:#ciclo para verificar que se ingrese el telefono correctamente
+               telefono=input(f"Administrador {nombre} ingrese su numero de telefono: ")
+               if telefono.isdigit():
+                    telefono=int(telefono)
+                    break
+               else:
+                     print("El telefono debe ser un valor unicamente numerico")
+                     continue
+
+            id_admi=menu.generar_id()#generador de id para el administrador
+            admin = Administrador(id_admi,nombre, documento, telefono)#se crea un administrador con los datos ingresados
             # sub-menu del administrador con sus distintas opciones
+            print(f"El administrador: {admin.nombre} esta usando el sistema")
             while True:# bucle del submenu administrador que se repite hasta que seleccione la opcion de volver
                 print("\n--- MENU ADMINISTRADOR ---")
                 print("1) Agregar plato")
@@ -229,7 +254,7 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                 print("1) Crear pedido")
                 print("2) Agregar plato")
                 print("3) Eliminar plato")
-                print("4) Ver total")
+                print("4) Ver total de un pedido")
                 print("5) Entregar pedido")
                 print("6) Ver menú")
                 print("7) Volver")
@@ -264,15 +289,20 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                   #bucle para agregar platos al pedido recien creado
                   while True:
                     print("\n---agregar platos al pedido---")
-                    print("Ingrese los datos del plato a agregar o '0' para terminar de agregar platos")
+                    mesero.ver_menu(menu)
+                    print("Ingrese los IDs de los platos a agregar o '0' para terminar de agregar platos")
                     try:
                      id_plato = int(input("ID plato: "))# id_plato (int) identifica el plato dentro del menú.
                     except:
-                     print(" ID invalido. Intente de nuevo")
+                     print("ID invalido. Intente de nuevo")
                      continue
                     if id_plato == 0:# Si se ingresa 0, se finaliza la carga de platos para este pedido recién creado.
-                     print("Finalizando ingreso de platos al pedido")
-                     print(f'el total es de $ {pedido.calcular_total()}') #Mostramos el total calculado invocando pedido.calcular_total()
+                     if not pedido.platos_pedidos:
+                        print(f"El pedido {id_p} de la mesa {mesa} no tiene platos agregados")
+                        print("No se pueden crear pedidos vacios")
+                        continue
+                     print(f"Finalizando ingreso de platos al pedido {id_p} a la mesa {mesa}")
+                     print(f'El total del pedido {id_p} de la mesa {mesa} es de $ {pedido.calcular_total()}') #Mostramos el total calculado invocando pedido.calcular_total()
                      break
 
 
@@ -292,9 +322,9 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                      print("Cantidad invalida. Intente de nuevo")
                      continue
 
-
                   #intentar agregar el plato al pedido
                     mesero.agregar_plato_a_pedido(pedido,plato,cantidad)
+                    print(f'Plato {plato.nombre} agregado correctamente al pedido {id_p} de la mesa {mesa}')
                     # Delegación: mesero llama a Pedido.agregar_plato internamente.
 
 
