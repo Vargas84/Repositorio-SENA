@@ -12,7 +12,7 @@ class Administrador(Usuario):#clase hija de la clase Usuario
     self.nombre=nombre
     self.documento=documento
     self.telefono=telefono
-
+    self.siguiente_id=1
 
 
   #GESTION DEL MENU---Funciones del administrador
@@ -38,7 +38,7 @@ class Administrador(Usuario):#clase hija de la clase Usuario
     for plato in menu.platos:# reccorre la lista que guarda los platos en la clase MENU
         if plato.id_plato == id_plato:# y busca por id_plato,
             plato.cambiarDisponibilidad()#si lo encuentra se llama a la funcion cambiarDisponibilidad() del objeto Plato
-            print(f'Disponibilidad del plato {plato.nombre} cambiada ')
+            print(f'Disponibilidad del plato {plato.nombre} cambiada a {plato.disponibilidad}')
             return
     print('Plato no encontrado')#en caso contrario se lanzara un mensaje de error
 

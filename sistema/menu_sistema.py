@@ -48,20 +48,10 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
         # ------------------- ADMINISTRADOR --------------------
         if opcion == 1:
             CLAVE_ADMINISTRADOR='admi123'
-            try:
-              clave= input('Ingrese la clave del Administrador: ')#se pide clave para acceder a las funciones unicas de administrador
-            except: 
-              print('Opcion invalida')#en caso de ingresar numeros o vacios o caracteres especiales
-              continue
-          
-            if clave != CLAVE_ADMINISTRADOR:#si la clave es incorrecta
-              print('Clave incorrecta, Acceso denegado')
-              continue #vuelve al menu principal
 
-            print('Clave correcta, Bienvenido administrador')#clave correcta da permiso al menu de administrador
             while True:#ciclo para validar que se ingrese un nombre correctamente
                nombre=input("Ingrese su nombre administrador: ")
-               if not es_letras_y_espacios(nombre) or nombre is None:
+               if not es_letras_y_espacios(nombre) or nombre is None:#verificacion de los datos para nombre de administrador
                   print("Verifique los datos del nombre")
                else:
                   break
@@ -81,8 +71,19 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                else:
                      print("El telefono debe ser un valor unicamente numerico")
                      continue
+            try:
+              clave= input('Ingrese la clave del Administrador: ')#se pide clave para acceder a las funciones unicas de administrador
+            except: 
+              print('Opcion invalida')#en caso de ingresar numeros o vacios o caracteres especiales
+              continue
+            if clave != CLAVE_ADMINISTRADOR:#si la clave es incorrecta
+              print('Clave incorrecta, Acceso denegado')
+              continue #vuelve al menu principal
 
-            id_admi=menu.generar_id()#generador de id para el administrador
+            print('Clave correcta, Bienvenido administrador')#clave correcta da permiso al menu de administrador
+          
+
+            id_admi=menu.generar_id_administrador()#generador de id para el administrador
             admin = Administrador(id_admi,nombre, documento, telefono)#se crea un administrador con los datos ingresados
             # sub-menu del administrador con sus distintas opciones
             print(f"El administrador: {admin.nombre} esta usando el sistema")
@@ -114,13 +115,13 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                         nombre = input("Nombre: ")#nombre del plato a registrar
                         precio = int(input("Precio: "))#precio del plato
                         categoria = input("Categoría: ")#etiqueta del plato
-                        id_p= menu.generar_id() #generador de ID automtico ID plato
+                        id_p= menu.generar_id_platos() #generador de ID automtico ID plato
                         if precio<=0 or not es_letras_y_espacios(nombre) or  not es_letras_y_espacios(categoria) :#se evaluan los valores ingresados con la funcion
                            #para verificar las cadenas y su cotenido
                            print("No se puede agregar un plato, valores inconsistentes, asegurese que el precio no sea menor que 0 \n" \
                            "y que el nombre/categoria solo contengan letras y espacios")
                         else:#si se pasan las respectivas pruebas se agrega el plato 
-                          admin.agregar_platos(menu, Plato(id_p, nombre, precio, categoria, True))
+                          admin.agregar_platos(menu, Plato(id_p, nombre, precio, categoria, "Disponible"))
                         # Creamos la instancia Plato con disponibilidad True por defecto y delegamos
                         # al administrador para agregarlo al objeto menu.
                           print(f'Plato agregado con ID automatico: {id_p}')
@@ -235,6 +236,29 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
         # ------------------- MESERO --------------------
         elif opcion == 2:# Si el usuario elige 2 en el menú principal, entramos al módulo Mesero.
             CLAVE_MESERO='mese123'#clave de acceso para el mesero
+
+            while True:#ciclo para validar que se ingrese un nombre correctamente
+               nombre=input("Ingrese su nombre mesero: ")
+               if not es_letras_y_espacios(nombre) or nombre is None:#verificacion de los datos para nombre 
+                  print("Verifique los datos del nombre")
+               else:
+                  break
+            while True:#ciclo para verificar que se ingrese el documento correctamente
+               documento=input(f"Mesero {nombre} ingrese su numero de documento: ")
+               if documento.isdigit():
+                  documento=int(documento)
+                  break
+               else:
+                  print("El documento debe ser un valor unicamente numerico")
+                  continue
+            while True:#ciclo para verificar que se ingrese el telefono correctamente
+               telefono=input(f"Mesero {nombre} ingrese su numero de telefono: ")
+               if telefono.isdigit():
+                    telefono=int(telefono)
+                    break
+               else:
+                     print("El telefono debe ser un valor unicamente numerico")
+                     continue
             try:
               clave=input('Ingrese la clave de acceso para mesero: ')#se recibe una clave ingresada por el usuario
             except:
@@ -244,84 +268,133 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
               print('Clave incorrecta, acceso denegado')
               continue
             print('Clave correcta, Bienvenido mesero')# en caso de coincidir se accede al menu mesero
-            mesero = Mesero("Pedro", 123456789, 30000000, 1)# Creamos una instancia Mesero por defecto para usar sus métodos.
+
+            id_mese=menu.generar_id_meseros()#generador de id para el mesero
+            # sub-menu del administrador con sus distintas opciones
+            mesero = Mesero(nombre,documento,telefono,id_mese)# Creamos una instancia Mesero por defecto para usar sus métodos.
             pedidos = {}
+            print(f"El mesero: {mesero.nombre} esta usando el sistema")
             # Diccionario donde se almacenan pedidos creados por el mesero:
             #   - claves: id_pedido (int)
             #   - valores: objeto Pedido
             while True:#bucle del submenu
-                print("\n--- MENU MESERO ---")
-                print("1) Crear pedido")
-                print("2) Agregar plato")
-                print("3) Eliminar plato")
-                print("4) Ver total de un pedido")
-                print("5) Entregar pedido")
-                print("6) Ver menú")
-                print("7) Volver")
+               print("\n--- MENU MESERO ---")
+               print("1) Crear pedido")
+               print("2) Buscar Pedido")
+               print("3) Eliminar Pedido")
+               print("4) Editar Pedido")
+               print("5) Ver Pedidos")
+               print("6) Entregar Pedido")
+               print("7) Ver menú")
+               print("8) Volver")
 
-                try:
+               try:
                     op = int(input("Opción: "))#determina la accion dentro del menu MESERO
-                except:
+               except:
                     print("Opción inválida.")
                     continue
 
-                if op < 1 or op > 7:
+               if op < 1 or op > 8:
                   print("Opción inválida.Opcion fuera de rango")
                   continue
 
-                if op == 1:#crear pedido
-                  try:
-                        id_p =  menu.generar_id() #generador de ID automtico ID pedidos
-                       #id_p identificara el pediod en el diccionario pedidos
-                        mesa = int(input("Mesa: "))
-                  except:
-                        print("Datos inválidos.")
-                        continue
+               if op == 1:#crear pedido
+                while True:#ciclo para validar que se ingrese un nombre correctamente
+                  nombre=input("Ingrese el nombre del cliente: ")
+                  if not es_letras_y_espacios(nombre) or nombre is None:#verificacion de los datos para nombre 
+                     print("Verifique los datos del nombre")
+                  else:
+                     break
+                while True:#ciclo para verificar que se ingrese el documento correctamente
+                 documento=input(f"Ingrese el  numero de documento del cliente {nombre}: ")
+                 if documento=="":
+                    documento=0
+                    break
+                 if documento.isdigit():
+                  documento=int(documento)
+                  break
+                 else:
+                  print("El documento debe ser un valor unicamente numerico")
+                  continue
+                while True:#ciclo para verificar que se ingrese el telefono correctamente
+                  telefono=input(f"Ingrese el numero de telefono del {nombre}: ")
+                  if telefono=="":
+                     telefono=0
+                     break
+                  if telefono.isdigit():
+                    telefono=int(telefono)
+                    break
+                  else:
+                     print("El telefono debe ser un valor unicamente numerico")
+                     continue
+                try:
+                  #id_p identificara el pediod en el diccionario pedidos
+                  mesa = int(input("Mesa: "))
+                except:
+                     print("Datos inválidos.")
+                     continue
 
-                  if id_p in pedidos:#se verifica si no existe ya un pedido con ese id
-                    print("Ese pedido ya existe.")
-                    continue
-
-                  cliente= Cliente("Cliente Mesa", 0, 0)#creamos un cliente temporal que sera propietario del pedido
-                  pedido= mesero.tomar_pedido(id_p, cliente, mesa)#mesero.tomar_pedido devuelve el objeto Pedido creado
-                  pedidos[id_p] = pedido#guardamos el obejto Pedido en el diccionario 'pedidos' usando id_p como clave
-                  print(f'Pedido creado con ID automatico: {id_p}')
+                id_p =  menu.generar_id_pedidos() #generador de ID automtico ID pedidos
+                cliente= Cliente(nombre,documento, telefono,id_cliente=menu.generar_id_clientes())#creamos un cliente temporal que sera propietario del pedido
+                #antes de crear el pedido verificar si hay platos
+                if menu.platos_disponibles()=="":
+                   print("No se puede crear pedidos porque el menu esta vacio")
+                   continue
+               #crea el pedido
+                pedido= mesero.tomar_pedido(id_p, cliente, mesa)#mesero.tomar_pedido devuelve el objeto Pedido creado
+                pedidos[id_p] = pedido#guardamos el obejto Pedido en el diccionario 'pedidos' usando id_p como clave
                   #bucle para agregar platos al pedido recien creado
-                  while True:
-                    print("\n---agregar platos al pedido---")
-                    mesero.ver_menu(menu)
+                while True:
+                  if menu.platos_disponibles()=="":#si no hay platos disponibles no dejara pasar el sistema
+                       print("No se pueden agregar platos aun , MENU vacio")
+                       del pedidos[id_p]
+                       break
+                  else:
+                    print(f"\n---agregar platos al pedido {id_p} de la mesa {mesa}---")#en caso contrario si lo hara
+                    print("-----------------Platos disponibles-----------------------")
+                    platos_disponibles=menu.platos_disponibles()
+                    print(platos_disponibles)
                     print("Ingrese los IDs de los platos a agregar o '0' para terminar de agregar platos")
                     try:
                      id_plato = int(input("ID plato: "))# id_plato (int) identifica el plato dentro del menú.
                     except:
                      print("ID invalido. Intente de nuevo")
                      continue
-                    if id_plato == 0:# Si se ingresa 0, se finaliza la carga de platos para este pedido recién creado.
-                     if not pedido.platos_pedidos:
+                    if id_plato == 0 and not pedido.platos_pedidos:# Si se ingresa 0, se finaliza la carga de platos para este pedido recién creado.
                         print(f"El pedido {id_p} de la mesa {mesa} no tiene platos agregados")
                         print("No se pueden crear pedidos vacios")
-                        continue
-                     print(f"Finalizando ingreso de platos al pedido {id_p} a la mesa {mesa}")
-                     print(f'El total del pedido {id_p} de la mesa {mesa} es de $ {pedido.calcular_total()}') #Mostramos el total calculado invocando pedido.calcular_total()
-                     break
-
-
-                    #1) buscar el plato
+                        try:
+                          print(f"Desea agregar platos al pedido {id_p} o Desea salir?")
+                          pregunta=input(f"A) Agregar platos al pedido {id_p}\nS) Salir\nIngrese una opcion: ").lower()
+                        except:
+                           print("Ingrese una opcion valida")
+                           continue
+                        if pregunta=="a":
+                           continue
+                        elif pregunta=="s":
+                           print("Pedido cancelado")
+                           del pedidos[id_p] #elimina pedido vacio
+                           break
+                        else:
+                           print("Opcion invalida")
+                           continue
+                    if id_plato==0:
+                           print(f"Ingreso finalizado Total del pedido {pedido.calcular_total()}")
+                           break
                     plato=menu.buscar_platos(id_plato)
                     if plato is None:# menu.buscar_platos devuelve el objeto Plato o None si no existe.
-                     print("Plato no encontrado.")
-                     continue
+                        print("Plato no encontrado.")
+                        continue
 
-                    if plato.disponibilidad == False:# Si el plato existe pero no está disponible, no se puede agregar.
-                     print(f"Plato {plato.nombre } no disponible.No se puede agregar")
-                     continue
+                    if plato.disponibilidad == "No Disponible":# Si el plato existe pero no está disponible, no se puede agregar.
+                        print(f"Plato {plato.nombre } no disponible.No se puede agregar")
+                        continue
 
                     try:
-                     cantidad= int(input("Cantidad: "))# cantidad (int) es cuántas unidades del plato se van a agregar al pedido.
+                        cantidad= int(input("Cantidad: "))# cantidad (int) es cuántas unidades del plato se van a agregar al pedido.
                     except:
-                     print("Cantidad invalida. Intente de nuevo")
-                     continue
-
+                        print("Cantidad invalida. Intente de nuevo")
+                        continue
                   #intentar agregar el plato al pedido
                     mesero.agregar_plato_a_pedido(pedido,plato,cantidad)
                     print(f'Plato {plato.nombre} agregado correctamente al pedido {id_p} de la mesa {mesa}')
@@ -329,35 +402,39 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
 
 
                 #al salir del sub-bucle, mostramos el total parcial
-                  pedido.calcular_total()
-                elif op == 2:#permitir agregar platos a un pedido ya existente(opcional)
-                    try:
-                        id_p = int(input("ID pedido: "))
-                    except:
+                    pedido.calcular_total()
+
+#INICIO DE COMENTARIO GIGANTE
+
+
+"""       elif op == 2:#permitir agregar platos a un pedido ya existente(opcional)
+            try:
+                id_p =  menu.generar_id_pedidos() #generador de ID automtico ID pedidos
+            except:
                         print("ID invalido")
                         continue
 
-                    if id_p not in pedidos:# Si el pedido no existe, pedimos crear primero (opción 1).
+            if id_p not in pedidos:# Si el pedido no existe, pedimos crear primero (opción 1).
                       print("Ese pedido no existe. Cree el pedido primero (Opcion 1)")
                       continue
 
-                    try:
+            try:
                         id_plato = int(input("ID plato: "))#id del plato a buscar para ser agregado
                         cantidad = int(input("Cantidad: "))#cantidad de ese plato
-                    except:
+            except:
                         print("Datos inválidos.")#en caso de ingresar datos no esperados
                         continue
 
 
-                    plato = menu.buscar_platos(id_plato)#buscar que el plato exista
-                    if plato is None:
+            plato = menu.buscar_platos(id_plato)#buscar que el plato exista
+            if plato is None:
                         print("Plato no encontrado.")#en caso de no ser encontrado
                         continue
 
-                    mesero.agregar_plato_a_pedido(pedidos[id_p], plato, cantidad)
+            mesero.agregar_plato_a_pedido(pedidos[id_p], plato, cantidad)
 # Agregamos el plato al pedido existente en el diccionario 'pedidos'
 
-                elif op == 3:#eliminar plato de un pedido
+        elif op == 3:#eliminar plato de un pedido
                     try:
                         id_p = int(input("ID del Pedido: "))#identificador del pedido a buscar para eliminarle platos
                     except:
@@ -377,7 +454,7 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                     mesero.eliminar_plato_de_pedido(pedidos[id_p],id_plato)
                     # Delegación: mesero llama a Pedido.eliminar_plato_pedido.
 
-                elif op == 4:#ver total de un pedido en especifico
+        elif op == 4:#ver total de un pedido en especifico
                     try:
                       id_p = int(input("ID pedido: "))#identificador del pedido a revisar
                     except:
@@ -392,7 +469,7 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                     print(f"El total del pedido {id_p} es: ${total}")# Se muestra el total al mesero.
 
 
-                elif op == 5:#entregar pedido
+        elif op == 5:#entregar pedido
                     try:
                       id_p = int(input("ID del pedido a entregar: "))
                     except:
@@ -411,16 +488,16 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                     #  - si no fue entregado, marca entregado=True y cambia estado a 'Entregado'.
 
 
-                elif op == 6:
+        elif op == 6:
                     mesero.ver_menu(menu)# 6) Ver menú (ayuda al mesero para mostrar los platos disponibles/registrados)
 
-                elif op == 7:#volver al menu principal
+        elif op == 7:#volver al menu principal
                     break
 
         # ------------------- CLIENTE --------------------
 
         elif opcion == 3:# Módulo Cliente: permite que el cliente cree y gestione sus pedidos.
-          cliente = Cliente("Cliente", 0, 0)# Creamos un objeto Cliente temporal para usar sus métodos.
+          #cliente = Cliente("Cliente", 0, 0)# Creamos un objeto Cliente temporal para usar sus métodos.
           pedidos_cliente = {}# Diccionario separado para pedidos creados por clientes (clave: id_pedido, valor: Pedido).
 
 
@@ -650,4 +727,4 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
             break
 #se crea el menu y arranca el sistema
 menu=Menu()
-#menuSistema(menu)
+#menuSistema(menu)"""

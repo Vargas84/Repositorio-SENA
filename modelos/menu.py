@@ -2,13 +2,39 @@ from .plato import Plato
 class Menu:#controla la manera en la que se muestra y utiliza el menu al los usuarios
   def __init__(self):
     self.platos=[]#lista de donde se almacenan todos los platos,inicialmente vacia
-    self.siguiente_id=1 #Nuevo: contador de IDs
+    self.administrador_id=1 #Nuevo: contador de IDs para administrador
+    self.platos_id=1 # contador de IDs para los platos
+    self.pedidos_id=1 # contador de IDs para pedidos
+    self.meseros_id=1 #contador de IDs para meseros
+    self.clientes_id=1#contador de IDs para clientes
     # los platos son agregados por el administrador
 
-  def generar_id(self):#generador de IDs para el menu
-    id_generado=self.siguiente_id #el id generado es igual al valor actual del id
-    self.siguiente_id+=1 #el ultimo id se aumenta una vez ya generado
-    return id_generado #retorna este valor
+  def generar_id_administrador(self):#generador de IDs para administrador
+    id_generador_administrador=self.administrador_id #el id generado es igual al valor actual del id
+    self.administrador_id+=1 #el ultimo id se aumenta una vez ya generado
+    return id_generador_administrador #retorna este valor
+  
+  def generar_id_platos(self):#generador de IDs para los platos
+    id_generador_platos=self.platos_id #el id generado es igual al valor actual del id
+    self.platos_id+=1 #el ultimo id se aumenta una vez ya generado
+    return id_generador_platos #retorna este valor
+  
+  def generar_id_pedidos(self):#generador de IDs para los platos
+    id_generador_pedidos=self.pedidos_id#el id generado es igual al valor actual del id
+    self.pedidos_id+=1#el ultimo id se aumenta una vez ya generado
+    return id_generador_pedidos#retorna este valor
+  
+  def generar_id_meseros(self):#generador de IDs para meseros
+    id_generador_meseros=self.meseros_id #el id generador es igual al valor actual del id
+    self.meseros_id+=1#el ultimo id se aumenta una vez ya generado
+    return id_generador_meseros#retorna este valor
+  
+  def generar_id_clientes(self):#generador de IDs para clientes
+    id_generador_clientes=self.clientes_id
+    self.clientes_id+=1
+    return id_generador_clientes
+
+
 #
   def agregar_plato(self,plato):#se agrega cada plato a la lista del menu
   #no realiza validaciones porque asumimos que el controlador (menuSistema)
@@ -48,10 +74,12 @@ class Menu:#controla la manera en la que se muestra y utiliza el menu al los usu
     #para que el que este llamando a la funcion pueda verificae y actuar con un mensaje de alerta
 
   def platos_disponibles(self):#solo mostrara los platos con disponibilidad en el menu
+    disponibles=""#acumulador de platos disponibles
   #util para mostrarle a un cliente que platos puede pedir en ese momento
-    print(' ')
-    print('Platos disponibles:')
     for plato in self.platos:#recorremos la lista de platos
-      if plato.disponibilidad==True:#verificamos la propiedad disponibilidad del objeto Plato
-        print(plato.mostrar_informacion())#se imprime la nformacion del plato si esta disponible
-    print(' ')
+      if plato.disponibilidad=="Disponible":#verificamos la propiedad disponibilidad del objeto Plato
+        disponibles+=plato.mostrar_informacion() +"\n"#se imprime la nformacion del plato si esta disponible
+
+    if disponibles=="":
+      print(' ')
+    return disponibles

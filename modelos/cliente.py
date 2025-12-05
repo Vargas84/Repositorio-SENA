@@ -5,11 +5,12 @@ from .usuarios import Usuario
 class Cliente(Usuario):
   #representa al cliente puede ver el menu, crear sus propios pedidos, agregar o eliminar platos
   # a su pedido, ver el total y ver el resumen
-  def __init__(self,nombre,documento,telefono):
+  def __init__(self,nombre,documento,telefono,id_cliente):
     super().__init__(nombre,documento,telefono)
     self.nombre=nombre
     self.documento=documento
     self.telefono=telefono
+    self.id_cliente=id_cliente
 
   def ver_menu(self,menu):
       menu.mostrar_menu()#el cliente puede ver el menu
