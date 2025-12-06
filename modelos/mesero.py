@@ -15,7 +15,7 @@ class Mesero(Usuario):
     def tomar_pedido(self,id_pedido,cliente,mesa):#el mesero puede tomar pedidos
     #crea un objeto Pedido con id_pedido, el cliente y la mesa
       pedido=Pedido(id_pedido,cliente,mesa)
-      print(f'Pedido {id_pedido} creado para mesa {mesa}/Cliente {cliente.nombre}')# se muestra un mensaje de la creacion del pedido
+      print(f'Pedido {id_pedido} creado para mesa {mesa} / Cliente {cliente.nombre}')# se muestra un mensaje de la creacion del pedido
       return pedido #devuelve el objeto pedido para que el controlador(Menu) lo almacene,
       #Devuelve el objeto pedido para uso externo
 

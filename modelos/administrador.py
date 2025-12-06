@@ -68,8 +68,11 @@ class Administrador(Usuario):#clase hija de la clase Usuario
 
 
     if nueva_categoria is not None:#editar categoria si no es nulo el valor
-        plato.categoria=nueva_categoria#se le asigna la nueva categoria
-        print(f'Categoria actualizada a: {nueva_categoria}')#se da aviso de la asignacion    
+        try:
+          plato.categoria=nueva_categoria#se le asigna la nueva categoria
+          print(f'Categoria actualizada a: {nueva_categoria}')#se da aviso de la asignacion    
+        except:
+           print("Error: ingrese datos correctos para la categoria")
     if nueva_categoria=="":#en caso de quedar en vacio el espacio el sistema dejara la misma categoria
           plato.categoria=plato.categoria#asignacion a la categoria que estaba
           print(f"La categoria del plato quedo igual {plato.categoria}")#aviso de esa asignacion

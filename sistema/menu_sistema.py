@@ -47,7 +47,8 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
 
         # ------------------- ADMINISTRADOR --------------------
         if opcion == 1:
-            CLAVE_ADMINISTRADOR='admi123'
+            CLAVE_ADMINISTRADOR='admi123'#clave para dar permiso al modulo de administracion
+            #solo administradores pueden entrar
 
             while True:#ciclo para validar que se ingrese un nombre correctamente
                nombre=input("Ingrese su nombre administrador: ")
@@ -89,13 +90,13 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
             print(f"El administrador: {admin.nombre} esta usando el sistema")
             while True:# bucle del submenu administrador que se repite hasta que seleccione la opcion de volver
                 print("\n--- MENU ADMINISTRADOR ---")
-                print("1) Agregar plato")
-                print("2) Eliminar plato")
-                print("3) Cambiar disponibilidad")
-                print("4) Editar plato")
-                print("5) Ver menú")
-                print("6) Buscar plato")
-                print("7) Volver")
+                print("1) Agregar plato")#agregar platos al menu para poder hacer los pedidos
+                print("2) Eliminar plato")#eliminar platos del menu cuando ya no se esten usando
+                print("3) Cambiar disponibilidad")#cambiar la disponibilidad de un plato cuando ya se haya acabado , para no permitir que lo pidan
+                print("4) Editar plato")#cambiar informacion de algun plato, como nombre, precio o categoriaa
+                print("5) Ver menú")#permite ver todo el menu 
+                print("6) Buscar plato")#retorna informacion de un plato por su ID
+                print("7) Volver")#regresa al menu anterior
 
                 try:
                     op = int(input("Opción: "))# variable para validar la opcion del menu
@@ -110,128 +111,154 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                   continue
                 
                 if op == 1:#agregar platos al menu
-                    try:
-                        #id_p=menu.generar_id()
+                     while True:#verificar nombre del plato
                         nombre = input("Nombre: ")#nombre del plato a registrar
-                        precio = int(input("Precio: "))#precio del plato
+                        if not es_letras_y_espacios(nombre) or nombre is None:#verificar que el nombre contenga letras y no sea vacio
+                           print("Nombre incorrecto, ingrese un nombre para el plato")
+                        else:
+                           break#en caso de pasar la validacion se rompe el ciclo y pasa al siguiente
+                     while True:#verificar precio
+                        precio =input("Precio: ").strip()#precio del plato
+                        if not precio:#precio vacio
+                           print("Precio incorrecto, ingrese un precio para el plato")#mensaje de advertencia
+                           continue#vuelve a pedir el precio si esta incorrecto
+                        try:#si el precio esta correcto
+                           precio=int(precio)#intentar pasarlo a un numero entero
+                           if precio<=0:#si el precio es inferior o igual a 0 
+                              print("Precio incorrecto, ingrese un precio valido")
+                              continue#es un precio invalido entonces lanza este error
+                           else:
+                              break
+                        except:
+                           print("Precio incorrecto, ingrese un precio valido")#en caso de ingresar letras o caracteres especiales
+                           continue
+                     while True:#verificar categoria
                         categoria = input("Categoría: ")#etiqueta del plato
-                        id_p= menu.generar_id_platos() #generador de ID automtico ID plato
-                        if precio<=0 or not es_letras_y_espacios(nombre) or  not es_letras_y_espacios(categoria) :#se evaluan los valores ingresados con la funcion
+                        if  not es_letras_y_espacios(categoria) or categoria is None:#se evaluan los valores ingresados con la funcion
                            #para verificar las cadenas y su cotenido
-                           print("No se puede agregar un plato, valores inconsistentes, asegurese que el precio no sea menor que 0 \n" \
-                           "y que el nombre/categoria solo contengan letras y espacios")
+                           print("Categoria incorrecta, ingrese una categoria para el plato")
                         else:#si se pasan las respectivas pruebas se agrega el plato 
-                          admin.agregar_platos(menu, Plato(id_p, nombre, precio, categoria, "Disponible"))
+                          break
+                     id_p= menu.generar_id_platos() #generador de ID automtico ID plato
+                     admin.agregar_platos(menu, Plato(id_p, nombre, precio, categoria, "Disponible"))
                         # Creamos la instancia Plato con disponibilidad True por defecto y delegamos
                         # al administrador para agregarlo al objeto menu.
-                          print(f'Plato agregado con ID automatico: {id_p}')
-                    except:
-    # Si falla la lectura de datos (p. ej. precio no es int), se maneja el error y se vuelve al submenú.
-                        print("Error: verfique los datos ingresados.")
-                        continue
+                     print(f'Plato agregado con ID automatico: {id_p}')
+                        
 
                 elif op == 2:#eliminar plato
-                    try:
                         admin.ver_menu(menu)#muestra el menu para saber que ID(plato) quiere eliminar
                         admin.eliminar_platos(menu, int(input("ID del plato a eliminar: ")))#Pide el ID, lo convierte a int
         # y delega la eliminación al administrador/Menu.
-                    except:
-                        print("ID inválido.")#en caso de no ingresar una opcion correcta
-                        continue
-
+                  
                 elif op == 3:#cambiar disponibilidad
-                    try:
-                        admin.ver_menu(menu)#muestra el menu para saber que ID(plato) quiere cambiar disponibilidad
-      #Pide el ID del plato y llama al método que invierte su disponibilidad.
-                        admin.cambiar_disponibilidad_plato(menu, int(input("ID del plato a cambiar disponibilidad: ")))
-                    except:
-                        print("ID inválido.")#encaso de ingresar un ID no valido
+                     try:
+                        admin.ver_menu(menu)#muestra el menu para saber que ID(plato) quiere editar(nombre,precio nuevo o categoria)
+                        id_p = int(input("ID del plato : "))#id_p es el id del plato que se quiere editar
+                     except:
+                        print("Error: ingrese un numero valido.")#en caso de que se ingrese una opcion incorrecta
                         continue
 
-                elif op == 4:#Editar plato (aquí el flujo pide el id y luego un nuevo precio y opcionalmente cambia disponibilidad)
+                     admin.cambiar_disponibilidad_plato(menu,id_p)#cuando el dato sea correcto lo cambia
+
+                elif op == 4:#Editar plato (aquí el flujo pide el id y luego un nuevo precio/nombre y y  disponibilidad)
                     try:
                         admin.ver_menu(menu)#muestra el menu para saber que ID(plato) quiere editar(nombre,precio nuevo o categoria)
                         id_p = int(input("ID del plato a editar: "))#id_p es el id del plato que se quiere editar
                     except:
                         print("Error: ingrese un numero valido.")#en caso de que se ingrese una opcion incorrecta
                         continue
-# Usamos menu.buscar_platos(id_p) para obtener la referencia al objeto Plato o None.
+                    # Usamos menu.buscar_platos(id_p) para obtener la referencia al objeto Plato o None.
                     plato = menu.buscar_platos(id_p)
 
                     if plato is None:
-# Si no existe un plato con ese id, informamos y volvemos al submenú.
+                    # Si no existe un plato con ese id, informamos y volvemos al submenú.
                         print("Plato no encontrado.")
                         continue
                     
-                    while True:
-                        print(f'¿Que desea editar del plato {plato.nombre}?')
+                    while True:#si el plato exiate entramos al menu de opciones a editar
+                        print(f'¿Que desea editar del plato {plato.nombre}?')#se pregunta que se desea editar del plato que ingresamos
                         print("1) Editar el nombre")
                         print("2) Editar el precio")
                         print("3) Editar la categoria")
                         print("4) Volver al menu anterior")
 
-                        try:
+                        try:#se pide la opcion a editar
                           op=int(input("Ingrese la opcion de edicion: "))
                         except:
-                           print("Error. Entrada invalida")
+                           print("Error. Entrada invalida\n")#en caso de una entrada no valida y vuelve al menu
                            continue
                         
                         if op<1 or op>4:
-                           print("Error: Opcion fuera de rango")
-                           continue
-                        elif op==1:
+                           print("Error: Opcion fuera de rango\n")#en caso de una opcionn fuera de rango
+                           continue#vuelve al menu
+                        elif op==1:#opcion que permite editar el nombre
                            nuevo_nombre=input('Ingrese el nuevo nombre del plato: ')#se pide un nuevo nombre
-                           if not es_letras_y_espacios(nuevo_nombre):
-                              print("El nombre debe contener solo letras\n")
+                           if nuevo_nombre=="":#si se deja un vacio el sistema dejara el nombre que tiene sin modificarlo
+                              plato.nombre=plato.nombre#se asigna nuevamente el mismo nombre
+                              print(f"El nombre del plato {plato.nombre} quedo igual: {plato.nombre}")#se da aviso de esta asignacion
+                              break#y se rompe el ciclo para nombre
+                           if not es_letras_y_espacios(nuevo_nombre):#si el nombre no contiene letras se da aviso de este error
+                              print("El nombre debe contener solo letras\n")#vuelve a preguntar por el nuevo nombre hasta que se ingrese bien
                            else:
-                              admin.editar_platos(menu,id_p,nuevo_nombre=nuevo_nombre)
-                        elif op==2:
+                              admin.editar_platos(menu,id_p,nuevo_nombre=nuevo_nombre)#si pasa las validaciones el nombre se agrega correctamente
+                              break#y se rompe el ciclo para nombre
+                        elif op==2:#editar el precio
                            nuevo_precio = input("ingrese el Nuevo precio del plato: ")#se pide el nuevo precio(int)
-                           if nuevo_precio.isdigit():
-                              nuevo_precio=int(nuevo_precio)
-                              if nuevo_precio>0:
-                                 admin.editar_platos(menu,id_p,nuevo_precio=nuevo_precio)
-                                 break
-                              elif nuevo_precio<=0:
-                                 print("El precio debe ser mayor a 0")
-                           elif nuevo_precio=="":
-                                plato.precio=plato.precio
-                                print(f"El precio del plato {plato.nombre} quedo igual: {plato.precio}")
+                           if nuevo_precio.isdigit():#se verifica que el nuevo precio sea un digito o sea numerico,sin puntos ni espacios
+                              nuevo_precio=int(nuevo_precio)#de ser un digito lo convierte de str a entero
+                              if nuevo_precio>0:#si este entero es mayor a 0
+                                 admin.editar_platos(menu,id_p,nuevo_precio=nuevo_precio)#el nuevo precio se agrega correctamente
+                                 break#y se rompe el ciclo
+                              elif nuevo_precio<=0:#en caso de que el entero sea inferior o igual a 0 
+                                 print("El precio debe ser mayor a 0")#se muestra un mensaje con ese error
+                           elif nuevo_precio=="":#si el precio es vacio se deja como estaba antes
+                                plato.precio=plato.precio#se hace la asignacion correspondiente
+                                print(f"El precio del plato {plato.nombre} quedo igual: {plato.precio}\n")#se muestra el mensaje
+                                break#se rompre el ciclo
                            else:
-                              print("El precio debe ser un numero")
-                        elif op==3:
-                           nueva_categoria=input('Ingrese la nueva categoria del plato: ')
-                           if not es_letras_y_espacios(nueva_categoria):
-                              print("La categoria debe contener solo letras\n")
-                           admin.editar_platos(menu, id_p,nueva_categoria=nueva_categoria) 
+                              print("El precio debe ser un numero\n")#en caso de ingresar valores diferentes a numeros
+                              continue#vuelve al menu 
+                        elif op==3:#editar la categoria del plato
+                           nueva_categoria=input('Ingrese la nueva categoria del plato: ')#se pide ingresar la nueva categoria
+                           if nueva_categoria=="":#si la categoria queda vacia se deja como estaba antes
+                              print(f"La categoria del plato {plato.nombre} quedo igual: {plato.nombre}")#se muestra un mensaje de esto
+                              break#se rompe el ciclo 
+                           if not es_letras_y_espacios(nueva_categoria):#se hace una validacion para verificar que solo sean letras dentro de categoria
+                              print("La categoria debe contener solo letras\n")#en caso de que no se muestra un mensaje de esto
+                           else:#en caso de que la validacion sea correcta
+                              admin.editar_platos(menu, id_p,nueva_categoria=nueva_categoria)#de procede a cambiar el estado de categoria
+                              break
                         elif op==4:#volver al menu anterior
-                           break
+                           break#se rompe el codigo
 
-                    admin.ver_menu(menu)#muestra como quedo el menu con los cambios que se hicieron en editar
+                    
                     print("Plato actualizado correctamente \n")
+                    admin.ver_menu(menu)#muestra como quedo el menu con los cambios que se hicieron en editar
                     
                 elif op == 5:#ver menu
                     admin.ver_menu(menu)#muestra la lista actual de platos(delegado al objeto menu)
 
 
                 elif op==6:#buscar un plato 
-                   admin.ver_menu(menu)
+                   admin.ver_menu(menu)#muestra los platos con sus IDs 
                    try:
-                     id_p=int(input('Ingrese el ID del plato a buscar: '))
+                     id_p=int(input('Ingrese el ID del plato a buscar: '))#pide el ID a buscar
                    except:
-                      print('Opcion invalida')
+                      print('Opcion invalida')#en caso de ingresar letras o vacios o caracteres especiales
                       continue
-                   plato = menu.buscar_platos(id_p)
+                   plato = menu.buscar_platos(id_p)#llama a la funcion buscar platos de menu
+                   #para verificar que el plato buscado este en el menu
 
-                   if plato is None:
+                   if plato is None:#si el plato no esta lanza un error
                       print('Plato no encontrado')
                       continue
                    # Mostrar información del plato
-                   print("\n--- INFORMACIÓN DEL PLATO ---")
+                   print("\n--- INFORMACIÓN DEL PLATO ---")#en caso contrario muestra la informacion del plato
                    print(plato.mostrar_informacion())
                    
                 elif op == 7:#volver al menu principal
-                  break#rompe el ciclo del meni administrado y vuelve al menu principal
+                  break#rompe el ciclo del menu administrado y vuelve al menu principal
 
         # ------------------- MESERO --------------------
         elif opcion == 2:# Si el usuario elige 2 en el menú principal, entramos al módulo Mesero.
@@ -299,110 +326,129 @@ def menuSistema(menu):#funcion principal que ejecuta el  menu del sistema y mues
                   continue
 
                if op == 1:#crear pedido
-                while True:#ciclo para validar que se ingrese un nombre correctamente
+                 if menu.platos_disponibles()=="":
+                   print("No se puede crear pedidos porque el menu esta vacio")
+                   continue
+                 while True:#ciclo para validar que se ingrese un nombre correctamente
                   nombre=input("Ingrese el nombre del cliente: ")
                   if not es_letras_y_espacios(nombre) or nombre is None:#verificacion de los datos para nombre 
                      print("Verifique los datos del nombre")
                   else:
                      break
-                while True:#ciclo para verificar que se ingrese el documento correctamente
-                 documento=input(f"Ingrese el  numero de documento del cliente {nombre}: ")
-                 if documento=="":
+                 while True:#ciclo para verificar que se ingrese el documento correctamente
+                  documento=input(f"Ingrese el  numero de documento del cliente {nombre}: ")
+                  if documento=="":
                     documento=0
                     break
-                 if documento.isdigit():
-                  documento=int(documento)
-                  break
-                 else:
-                  print("El documento debe ser un valor unicamente numerico")
-                  continue
-                while True:#ciclo para verificar que se ingrese el telefono correctamente
-                  telefono=input(f"Ingrese el numero de telefono del {nombre}: ")
-                  if telefono=="":
+                  if documento.isdigit():
+                   documento=int(documento)
+                   break
+                  else:
+                   print("El documento debe ser un valor unicamente numerico")
+                   continue
+                 while True:#ciclo para verificar que se ingrese el telefono correctamente
+                   telefono=input(f"Ingrese el numero de telefono del {nombre}: ")
+                   if telefono=="":
                      telefono=0
                      break
-                  if telefono.isdigit():
+                   if telefono.isdigit():
                     telefono=int(telefono)
                     break
-                  else:
+                   else:
                      print("El telefono debe ser un valor unicamente numerico")
                      continue
-                try:
-                  #id_p identificara el pediod en el diccionario pedidos
-                  mesa = int(input("Mesa: "))
-                except:
-                     print("Datos inválidos.")
-                     continue
+                 while True:
+                     mesa=input(f"Ingrese un numero de mesa: ")
+                     if mesa=="":
+                        print("Ingrese un numero de mesa valido por vacio")
+                        continue
+                     if mesa.isdigit():
+                        mesa=int(mesa)
+                        break
+                     else:
+                        print("Ingrese un numero de mesa valido desde else")
+                        continue
+                   
 
-                id_p =  menu.generar_id_pedidos() #generador de ID automtico ID pedidos
-                cliente= Cliente(nombre,documento, telefono,id_cliente=menu.generar_id_clientes())#creamos un cliente temporal que sera propietario del pedido
+                #id_p =  menu.generar_id_pedidos() #generador de ID automtico ID pedidos
+               cliente= Cliente(nombre,documento, telefono,id_cliente=menu.generar_id_clientes())#creamos un cliente temporal que sera propietario del pedido
                 #antes de crear el pedido verificar si hay platos
-                if menu.platos_disponibles()=="":
-                   print("No se puede crear pedidos porque el menu esta vacio")
-                   continue
+
                #crea el pedido
-                pedido= mesero.tomar_pedido(id_p, cliente, mesa)#mesero.tomar_pedido devuelve el objeto Pedido creado
-                pedidos[id_p] = pedido#guardamos el obejto Pedido en el diccionario 'pedidos' usando id_p como clave
+                
                   #bucle para agregar platos al pedido recien creado
-                while True:
+                  #1)pedir platos antes que hacer el pedido
+               platos_temporales=[]
+               while True:
                   if menu.platos_disponibles()=="":#si no hay platos disponibles no dejara pasar el sistema
                        print("No se pueden agregar platos aun , MENU vacio")
-                       del pedidos[id_p]
+                     
                        break
-                  else:
-                    print(f"\n---agregar platos al pedido {id_p} de la mesa {mesa}---")#en caso contrario si lo hara
-                    print("-----------------Platos disponibles-----------------------")
-                    platos_disponibles=menu.platos_disponibles()
-                    print(platos_disponibles)
-                    print("Ingrese los IDs de los platos a agregar o '0' para terminar de agregar platos")
-                    try:
+                  
+                  print(f"\n---agregar platos al pedido de la mesa {mesa}---")#en caso contrario si lo hara
+                  print("-----------------Platos disponibles-----------------------")
+                  platos_disponibles=menu.platos_disponibles()
+                  print(platos_disponibles)
+                  print("Ingrese los IDs de los platos a agregar o '0' para terminar de agregar platos")
+                  try:
                      id_plato = int(input("ID plato: "))# id_plato (int) identifica el plato dentro del menú.
-                    except:
-                     print("ID invalido. Intente de nuevo")
-                     continue
-                    if id_plato == 0 and not pedido.platos_pedidos:# Si se ingresa 0, se finaliza la carga de platos para este pedido recién creado.
-                        print(f"El pedido {id_p} de la mesa {mesa} no tiene platos agregados")
-                        print("No se pueden crear pedidos vacios")
-                        try:
-                          print(f"Desea agregar platos al pedido {id_p} o Desea salir?")
-                          pregunta=input(f"A) Agregar platos al pedido {id_p}\nS) Salir\nIngrese una opcion: ").lower()
-                        except:
-                           print("Ingrese una opcion valida")
-                           continue
-                        if pregunta=="a":
-                           continue
-                        elif pregunta=="s":
-                           print("Pedido cancelado")
-                           del pedidos[id_p] #elimina pedido vacio
-                           break
+                  except:
+                      print("ID invalido. Intente de nuevo")
+                      continue
+                  #mesero oprime 0 sin platos agregados
+
+                  if id_plato == 0 :# Si se ingresa 0, se finaliza la carga de platos 
+                        if not platos_temporales:
+                          print(f"El pedido de la mesa {mesa} no tiene platos agregados")
+                          print("No se pueden crear pedidos vacios")
+                          while True:
+                             pregunta=input(f"A) Agregar platos al pedido {id_p}\nS) Salir\nIngrese una opcion: ").lower()
+                             if pregunta=="a":
+                              #se vuelven a mostrar los platoas disponibles
+                              break
+                        
+                             elif pregunta=="s":
+                               print("Pedido cancelado.No se creo ningun pedido")
+                               #No se crea ningun ID
+                               platos_temporales=[]#limpiar por si acaso
+                               break
+                             else:
+                                print("Opcion invalida")
+                                continue
+                          if pregunta=="s":#si eligio salir, salir del ciclo principal
+                            break
+                          continue #si eligio a, continua el while del ciclo principal
                         else:
-                           print("Opcion invalida")
-                           continue
-                    if id_plato==0:
-                           print(f"Ingreso finalizado Total del pedido {pedido.calcular_total()}")
+                           print("Finalizando carga de platos")
                            break
-                    plato=menu.buscar_platos(id_plato)
-                    if plato is None:# menu.buscar_platos devuelve el objeto Plato o None si no existe.
-                        print("Plato no encontrado.")
+                  #si ingresa in ID normal -> agrega un plato
+                  plato=menu.buscar_platos(id_plato)
+                  if plato is None:
+                        print("Plato no encontrado")
                         continue
-
-                    if plato.disponibilidad == "No Disponible":# Si el plato existe pero no está disponible, no se puede agregar.
-                        print(f"Plato {plato.nombre } no disponible.No se puede agregar")
+                  if plato.disponibilidad=="No Disponible":
+                        print(f"Plato {plato.nombre} no disponible")
                         continue
-
-                    try:
-                        cantidad= int(input("Cantidad: "))# cantidad (int) es cuántas unidades del plato se van a agregar al pedido.
-                    except:
-                        print("Cantidad invalida. Intente de nuevo")
+                  try:
+                        cantidad=int(input("Cantidad: "))
+                    
+                  except:
+                        print("Cantidad invalida")
                         continue
-                  #intentar agregar el plato al pedido
-                    mesero.agregar_plato_a_pedido(pedido,plato,cantidad)
-                    print(f'Plato {plato.nombre} agregado correctamente al pedido {id_p} de la mesa {mesa}')
-                    # Delegación: mesero llama a Pedido.agregar_plato internamente.
-
-
-                #al salir del sub-bucle, mostramos el total parcial
-                    pedido.calcular_total()
+                  platos_temporales.append((plato,cantidad))
+                  print(f"{cantidad} platos de {plato.nombre} agregado(s)")
+                  #solo ahora se crea el pedido REAL si hay platos
+               if platos_temporales:
+                     id_p =  menu.generar_id_pedidos() #generador de ID automtico ID pedidos
+                     pedido= mesero.tomar_pedido(id_p, cliente, mesa)#mesero.tomar_pedido devuelve el objeto Pedido creado
+                     pedidos[id_p] = pedido#guardamos el obejto Pedido en el diccionario 'pedidos' usando id_p como clave
+                        
+                     for plato, cantidad in platos_temporales:
+                        #intentar agregar el plato al pedido
+                        mesero.agregar_plato_a_pedido(pedido,plato,cantidad)
+                     print(f"El total del pedido {id_p} es de: {pedido.calcular_total()}")
+               else:
+                        print("No se creo ningun pedido")
 
 #INICIO DE COMENTARIO GIGANTE
 
